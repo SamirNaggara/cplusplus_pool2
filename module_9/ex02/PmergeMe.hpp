@@ -6,7 +6,7 @@
 /*   By: snaggara <snaggara@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/25 14:22:51 by snaggara          #+#    #+#             */
-/*   Updated: 2023/07/26 15:26:39 by snaggara         ###   ########.fr       */
+/*   Updated: 2023/07/26 19:46:27 by snaggara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,34 +37,41 @@
 #ifndef __PMERGE_ME__
 # define __PMERGE_ME__
 
-#include <vector>
+#include <deque>
 #include <exception>
 
-typedef std::vector<int> intVector_t;
-typedef intVector_t::iterator intVectorIt_t;
-typedef std::vector<std::pair<int, int> > pairVector_t;
-typedef pairVector_t::iterator pairVectorIt_t;
+typedef std::deque<int> intDeque_t;
+typedef intDeque_t::iterator intdequeIt_t;
+typedef std::deque<std::pair<int, int> > pairDeque_t;
+typedef pairDeque_t::iterator pairDequeIt_t;
 
 class PmergeMe
 {
 
-	PmergeMe();
 	PmergeMe(PmergeMe const& other);
 	PmergeMe&	operator=(PmergeMe const& other);
 
-	static intVector_t _sortOneElement(intVector_t& originalVector);
+	intDeque_t _sortOneElement(intDeque_t& originalDeque);
 
-	static pairVector_t	_createPairs(intVector_t & originalVector);
+	pairDeque_t	_createPairs(intDeque_t & originalDeque);
 
 	static void _orderPairDecreasing(std::pair<int,int> &pair);
 
-	static int	_found_second(int const &nb, pairVector_t &pairs);
+	int	_found_second(int const &nb, pairDeque_t &pairs);
 	
 	static int	_get_second(std::pair<int, int> pair);
+
+	// void	addSecondElements();
+
+	pairDeque_t 	_pairDeque;
+	intDeque_t 	_firstPairDeque;
+
+
 public:
+	PmergeMe();
 	~PmergeMe(){};
 
-	static intVector_t	mergeSort(intVector_t& originalVector);
+	intDeque_t	mergeSort(intDeque_t& originalDeque);
 
 	class FirstNotFound : public std::exception
 	{

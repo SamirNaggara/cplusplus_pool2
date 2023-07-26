@@ -6,7 +6,7 @@
 /*   By: snaggara <snaggara@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/26 12:21:48 by snaggara          #+#    #+#             */
-/*   Updated: 2023/07/26 13:29:27 by snaggara         ###   ########.fr       */
+/*   Updated: 2023/07/26 16:27:22 by snaggara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include <sstream>
 #include "PmergeMe.hpp"
 #include <string>
-#include <vector>
+#include <deque>
 
 int	main(int ac, char **av)
 {
@@ -24,21 +24,22 @@ int	main(int ac, char **av)
 		return (0);
 	}
 	int number;
-	std::vector<int> originalVector;
+	std::deque<int> originalDeque;
 	for (int i = 1; i < ac; i++)
 	{
 		std::istringstream iss(av[i]);
 		iss >> number;
-		originalVector.push_back(number);
+		originalDeque.push_back(number);
 	}
 
-	// for (std::vector<int>::iterator it = originalVector.begin(); it != originalVector.end(); it++)
+	// for (std::deque<int>::iterator it = originalDeque.begin(); it != originalDeque.end(); it++)
 	// 	std::cout << *it << std::endl;
 
-	std::vector<int> result = PmergeMe::mergeSort(originalVector);
+	PmergeMe merge;
+	std::deque<int> result = merge.mergeSort(originalDeque);
 
 	std::cout << "La liste triée : " << std::endl;
-	for (std::vector<int>::iterator it = result.begin(); it != result.end(); it++)
+	for (std::deque<int>::iterator it = result.begin(); it != result.end(); it++)
 		std::cout << *it << " ";
 	std::cout << std::endl;
 
