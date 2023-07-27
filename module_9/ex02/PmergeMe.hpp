@@ -6,7 +6,7 @@
 /*   By: snaggara <snaggara@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/25 14:22:51 by snaggara          #+#    #+#             */
-/*   Updated: 2023/07/26 19:46:27 by snaggara         ###   ########.fr       */
+/*   Updated: 2023/07/27 14:19:15 by snaggara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,8 @@
 # define __PMERGE_ME__
 
 #include <deque>
+#include <vector>
+#include <map>
 #include <exception>
 
 typedef std::deque<int> intDeque_t;
@@ -53,36 +55,87 @@ class PmergeMe
 
 	intDeque_t _sortOneElement(intDeque_t& originalDeque);
 
-	pairDeque_t	_createPairs(intDeque_t & originalDeque);
+	void	_createPairs();
 
 	static void _orderPairDecreasing(std::pair<int,int> &pair);
 
-	int	_found_second(int const &nb, pairDeque_t &pairs);
+	//int	_found_second(int const &nb);
 	
-	static int	_get_second(std::pair<int, int> pair);
+	//static int	_get_second(int const& nb);
+	static int	_get_first(std::pair<int, int> pair);
 
-	// void	addSecondElements();
+	void	_addSecondElements();
+	void	_addSecondElementsWithJacob();
+
+	void	_add_by_dichotomie(int nb, intdequeIt_t begin, int length);
 
 	pairDeque_t 	_pairDeque;
-	intDeque_t 	_firstPairDeque;
+	intDeque_t 		_originalDeque;
+	intDeque_t 		_firstPairDeque;
+	intDeque_t 		_secondPairDeque;
+
+
+	void	_sortEachPair();
+	void	_createFirstPairDeque();
+	void	_createSecondPairDeque();
+
+	PmergeMe();
+
+	void		_createJacobsthalDeque(unsigned long nmoins1, unsigned long nmoins2);
+	void	_nextNumberJacob(int & nb);
+
+	int	_is_in_jacob(int nb);
+
+	//void	_jacobItOrder(int &i, intdequeIt_t &it);
+	int		_jacobOffset(int const &nb);
 
 
 public:
-	PmergeMe();
+	std::vector<int>	_jacobSuitNumbers;
+	PmergeMe(intDeque_t& originalDeque);
 	~PmergeMe(){};
 
-	intDeque_t	mergeSort(intDeque_t& originalDeque);
+	intDeque_t	jacobsthalSuit;
+
+	intDeque_t	mergeSort();
+
+	void	buildJacNumberSuit();
+
 
 	class FirstNotFound : public std::exception
 	{
 		public:
 			const char * what() const throw()
 			{
-				return "FirstNotFount error : You try to found the second element using a first element of the pair, but the first element doesn't exist";
+				return "FirstNotFound error : You try to found the second element using a first element of the pair, but the first element doesn't exist";
 			}
 	};
-};
 
+	/*Ceci est un foncteur
+	Il sert a creer un deque avec les seconds pairs
+	Mais en se basant sur le bon ordre
+	*/
+	struct GetSecond
+	{
+	private:
+		pairDeque_t 	_pairDeque;
+
+	public:
+		GetSecond(pairDeque_t &pairDeque)
+			: _pairDeque(pairDeque)
+			{}
+		int operator()(int const& nb)
+		{
+			for (pairDequeIt_t it = _pairDeque.begin(); it != _pairDeque.end(); it++)
+			{
+				if (it->first == nb)
+					return (it->second);
+			}
+			throw PmergeMe::FirstNotFound();
+		}
+
+	};
+};
 
 
 
