@@ -6,15 +6,12 @@
 /*   By: snaggara <snaggara@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/25 14:22:47 by snaggara          #+#    #+#             */
-/*   Updated: 2023/07/27 14:50:54 by snaggara         ###   ########.fr       */
+/*   Updated: 2023/07/30 23:03:15 by snaggara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "PmergeMe.hpp"
-#include <iostream>
-#include <utility>
-#include <algorithm>
-#include <limits>
+
 
 /*
 	Samir, tu es en pleine implémentation du truc de jacob la.
@@ -92,6 +89,8 @@ intDeque_t	PmergeMe::mergeSort()
 	
 	_addSecondElementsWithJacob();
 	
+	_addLastIfOdd();
+	
 	return (_firstPairDeque);
 }
 
@@ -141,71 +140,75 @@ void	PmergeMe::_addSecondElements()
 		it = _secondPairDeque.erase(it);
 		i++;
 	}
-	// Si la liste est impaire, faut pas oublier d'ajouter le petit dernier
-	if (_originalDeque.size() % 2 == 1)
-	{
-		//_firstPairDeque.push_back(*(_originalDeque.end() - 1));
-		_add_by_dichotomie(*(_originalDeque.end() - 1), _firstPairDeque.begin(), _firstPairDeque.size() - 1);
-	}
+
 }
+
 
 void	PmergeMe::_addSecondElementsWithJacob()
 {
+	intdequeIt_t itD2 = _secondPairDeque.begin();
+
+	_firstPairDeque.push_front(*itD2);
+	if (_secondPairDeque.size() == 1)
+		return ;
+	itD2++;
+	_add_by_dichotomie(*itD2, _firstPairDeque.begin(), 1);
+	itD2--;
+	if (_secondPairDeque.size() == 2)
+		return ;
 	int i = 0;
-	size_t compteur = 0;    
-	intdequeIt_t it = _secondPairDeque.begin();
-
-	// Le premier element est juste poussé, ce sera automatiquement dans l'ordre
-	_firstPairDeque.push_front(*it);
-	compteur++;
-
-	int offset = _jacobOffset(i);
-	if (offset == -1)
-	{
-		i--;
-		it--;
-	}
-	else{
-		for (int j = 0; j < offset; i++)
-		{
-			it++;
-			i++;
-			if (it == _secondPairDeque.end())
-			{
-				it--;
-				break;
-			}
-		}
-	}
-	it+=offset;
+	size_t compteur = 2;
+	int length = 2;
+	_maxI = 1;
 	while (compteur < _secondPairDeque.size())
 	{
-		_add_by_dichotomie(
-			*it,  // Le nb a ajouté par dicho
-			_firstPairDeque.begin(), 				// Le debut
-			2 * i + 1);								// La fin de ou il doit essayé d'inserer
-
 		compteur++;
-		
+		_advanceCursor(i, itD2, length);
+		_add_by_dichotomie(
+			*itD2,  // Le nb a ajouté par dicho
+			_firstPairDeque.begin(), 				// Le debut
+			length);								// La fin de ou il doit essayé d'inserer
+	}
+}
+
+void	PmergeMe::_advanceCursor(int &i, intdequeIt_t &itD2, int &length)
+{
+		int offset = _jacobOffset(i);
+		int nbMissed = 0;
 		if (offset == -1)
 		{
+			itD2--;
 			i--;
-			it--;
 		}
 		else{
-			for (int j = 0; j < offset; i++)
+			for (int j = 0; j < offset; j++)
 			{
-				it++;
+				itD2++;
 				i++;
-				if (it == _secondPairDeque.end())
+				if (i > _maxI)
+					nbMissed++;
+				if (itD2 == _secondPairDeque.end())
 				{
-					it--;
-					break;
+					i--;
+					itD2--;
+					nbMissed--;
+					if (i == 2)
+						length = 3;
+					else
+						length = 2 * (i) - nbMissed;
+					nbMissed = 0;
+					_maxI = i;
+					return ;
 				}
 			}
+			length = 2 * (i) - nbMissed;
+			nbMissed = 0;
+			_maxI = i;
 		}
-	}
-	// Si la liste est impaire, faut pas oublier d'ajouter le petit dernier
+}
+
+void	PmergeMe::_addLastIfOdd()
+{
 	if (_originalDeque.size() % 2 == 1)
 	{
 		//_firstPairDeque.push_back(*(_originalDeque.end() - 1));
@@ -325,7 +328,7 @@ int	PmergeMe::_jacobOffset(int const &nb)
 
 	if (found != jacobsthalSuit.end())
 	{
-		found = found + 2;
+		found+=2;
 		return (*found - nb);
 	}
 	else
