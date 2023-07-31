@@ -6,63 +6,36 @@
 /*   By: snaggara <snaggara@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/25 14:22:47 by snaggara          #+#    #+#             */
-/*   Updated: 2023/07/30 23:03:15 by snaggara         ###   ########.fr       */
+/*   Updated: 2023/07/30 23:55:23 by snaggara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "PmergeMe.hpp"
 
-
-/*
-	Samir, tu es en pleine implémentation du truc de jacob la.
-	Ton code marche bien si tu n'optimises pas avec Jacob, donc si t'utilises la fonction add_secondElement au lieu de addSecondElementWithJacob.
-
-	Tu as créé une super fonction qui te dis pour chaque nombre s'il faut faire -1 ou + quelque chose pour respecteur l'ordre de Jacob.
-
-	Maintenant, dans ta fonction addSecondElementWIthJacob, tu as essayé de l'imprementer mais c'est compliqué.
-
-	Deja parce que defois Jacob te fais sortir du deque des seconds elements, donc au moment ou on fait un + il faut essayer de ramener au dernier element.
-
-	Mais il faut aussi controler la longueuer.
-	Quand tu appelles dischotomie, sur quelle longueur tu as besoin de l'appeler exactement ?
-	Je pense que c'est i, mais c'est a vérifier.
-
-	En tout cas le probleme c'est que tu segfault a partir de 4 éléments, donc il faut voir en détail ce qu'il se passe.
-
-	Il y a aussi un doute sur la bonne opti.
-	Es ce qu'il faut faire 0, puis 3, puis 2, puis 1, puis 5 puis 4, etc etc...?
-	Exactement comme Jacob ?
-	Ou esce qun peu différent ?
-	Je pense que c'est un peu différent, mais c'est dure a determiner !!!
-*/
-
 PmergeMe::PmergeMe(){};
 
+/*A la construction, on initialise statiquement le jacobien, si il n'existe pas*/
 PmergeMe::PmergeMe(intDeque_t& originalDeque)
 	:_originalDeque(originalDeque)
 {
-	if (jacobsthalSuit.size() == 0)
+    gettimeofday(&_start, NULL);
+	
+	if (_jacobsthalSuit.size() == 0)
+	{
 		_createJacobsthalDeque(1, 1);
-	jacobsthalSuit.pop_front();
-	jacobsthalSuit.push_back(-1);
-	// for (intdequeIt_t it = jacobsthalSuit.begin(); it != jacobsthalSuit.end(); it++)
-	// 	std::cout << *it << " ";
-	// std::cout << std::endl << std::endl;
-	
-
-	
+		_jacobsthalSuit.pop_front();
+		_jacobsthalSuit.push_back(-1);
+	}
 };
 
 PmergeMe&	PmergeMe::operator=(PmergeMe const& other)
 {
-	(void)other;
+	static_cast<void>(other);
 	return (*this);
 }
+
 PmergeMe::PmergeMe(PmergeMe const& other)
 	{(void)other;}
-
-// End private coplieen methods
-
 
 
 intDeque_t	PmergeMe::mergeSort()
@@ -70,34 +43,21 @@ intDeque_t	PmergeMe::mergeSort()
 	if (_originalDeque.size() == 1)
 		return _sortOneElement(_originalDeque);
 
-	// On cree un vecteur contenant les pairs
 	_createPairs();
-
-	// On s'assure que le first est le plus grand !
 	_sortEachPair();
-
-	// On créé un vecteur avec les premieres pairs
 	_createFirstPairDeque();
-
-	/* Ordonne par recursion les pairs de vecteurs*/
 	PmergeMe merge(_firstPairDeque);
 	_firstPairDeque = merge.mergeSort();
-
-
 	_createSecondPairDeque();
-
-	
 	_addSecondElementsWithJacob();
-	
 	_addLastIfOdd();
-	
+	gettimeofday(&_end, NULL);
 	return (_firstPairDeque);
 }
 
 void	PmergeMe::_createSecondPairDeque()
 {
 	GetSecond getSecond(_pairDeque);
-	
 	std::transform(_firstPairDeque.begin(), _firstPairDeque.end(), std::back_inserter(_secondPairDeque), getSecond);
 }
 
@@ -113,37 +73,6 @@ void	PmergeMe::_sortEachPair()
 	std::for_each(_pairDeque.begin(), _pairDeque.end(), _orderPairDecreasing);
 }
 
-
-/*Créée une fonction dichtomie
-Elle prends un iterateur de debut et de fin en parametre
-Et on connais la longueur dans laquelle on regarde
-Elle regarde au milieu de ce tableau si elle peut inserer la, sinon c'est a gauche ou a droite
-Puis, elle regarde a nouveau au milieu si elle peut inserer la
-etc etc...
-Jusqu'a trouver ou inserer le nombre, et la, elle insere*/
-
-void	PmergeMe::_addSecondElements()
-{
-	int i = 0;       
-	intdequeIt_t it = _secondPairDeque.begin();
-
-	// Le premier element est juste poussé, ce sera automatiquement dans l'ordre
-	_firstPairDeque.push_front(*it);
-
-	it = _secondPairDeque.erase(it);
-	while (it != _secondPairDeque.end())
-	{
-		_add_by_dichotomie(
-			*it,  // Le nb a ajouté par dicho
-			_firstPairDeque.begin(), 				// Le debut
-			2 * i + 1);								// La fin de ou il doit essayé d'inserer
-		it = _secondPairDeque.erase(it);
-		i++;
-	}
-
-}
-
-
 void	PmergeMe::_addSecondElementsWithJacob()
 {
 	intdequeIt_t itD2 = _secondPairDeque.begin();
@@ -156,18 +85,17 @@ void	PmergeMe::_addSecondElementsWithJacob()
 	itD2--;
 	if (_secondPairDeque.size() == 2)
 		return ;
+
 	int i = 0;
 	size_t compteur = 2;
 	int length = 2;
 	_maxI = 1;
+
 	while (compteur < _secondPairDeque.size())
 	{
 		compteur++;
 		_advanceCursor(i, itD2, length);
-		_add_by_dichotomie(
-			*itD2,  // Le nb a ajouté par dicho
-			_firstPairDeque.begin(), 				// Le debut
-			length);								// La fin de ou il doit essayé d'inserer
+		_add_by_dichotomie(*itD2, _firstPairDeque.begin(), length);								
 	}
 }
 
@@ -175,43 +103,37 @@ void	PmergeMe::_advanceCursor(int &i, intdequeIt_t &itD2, int &length)
 {
 		int offset = _jacobOffset(i);
 		int nbMissed = 0;
+		
 		if (offset == -1)
 		{
 			itD2--;
 			i--;
+			return ;
 		}
-		else{
-			for (int j = 0; j < offset; j++)
+		
+		for (int j = 0; j < offset; j++)
+		{
+			itD2++;
+			i++;
+			if (i > _maxI)
+				nbMissed++;
+			if (itD2 == _secondPairDeque.end())
 			{
-				itD2++;
-				i++;
-				if (i > _maxI)
-					nbMissed++;
-				if (itD2 == _secondPairDeque.end())
-				{
-					i--;
-					itD2--;
-					nbMissed--;
-					if (i == 2)
-						length = 3;
-					else
-						length = 2 * (i) - nbMissed;
-					nbMissed = 0;
-					_maxI = i;
-					return ;
-				}
+				i--;
+				itD2--;
+				nbMissed--;
+				break ;
 			}
-			length = 2 * (i) - nbMissed;
-			nbMissed = 0;
-			_maxI = i;
 		}
+		length = 2 * i - nbMissed;
+		nbMissed = 0;
+		_maxI = i;
 }
 
 void	PmergeMe::_addLastIfOdd()
 {
 	if (_originalDeque.size() % 2 == 1)
 	{
-		//_firstPairDeque.push_back(*(_originalDeque.end() - 1));
 		_add_by_dichotomie(*(_originalDeque.end() - 1), _firstPairDeque.begin(), _firstPairDeque.size() - 1);
 	}
 }
@@ -230,29 +152,37 @@ void	PmergeMe::_add_by_dichotomie(int nb, intdequeIt_t begin, int length)
 	{
 		if (nb < *begin)
 			_firstPairDeque.insert(begin, nb);
-		else
+		else if (nb > *begin)
 			_firstPairDeque.insert(begin + 1, nb);
+		else
+			throw DuplicateNumbers(nb);
 	}
 	else if (length == 1)
 	{
 		if (nb < *(begin + half))
 			_add_by_dichotomie(nb, begin, half);
-		else
+		else if (nb > *(begin + half))
 			_add_by_dichotomie(nb, begin + 1, half);
+		else
+			throw DuplicateNumbers(nb);
 	}
 	else if (length % 2 == 1)
 	{
 		if (nb < *(begin + half))
 			_add_by_dichotomie(nb, begin, half - 1);
-		else
+		else if (nb > *(begin + half))
 			_add_by_dichotomie(nb, begin + half + 1, half);
+		else
+			throw DuplicateNumbers(nb);
 	}
 	else if (length % 2 == 0)
 	{
 		if (nb < *(begin + half))
 			_add_by_dichotomie(nb, begin, half - 1);
-		else
+		else if (nb > *(begin + half))
 			_add_by_dichotomie(nb, begin + half + 1, half - 1);
+		else
+			throw DuplicateNumbers(nb);
 	}
 }
 
@@ -290,17 +220,17 @@ void	PmergeMe::_createJacobsthalDeque(unsigned long nmoins2, unsigned long nmoin
 {
 	if (nmoins1 == 1 && nmoins2 == 1)
 	{
-		PmergeMe::jacobsthalSuit.push_back(1);
-		PmergeMe::jacobsthalSuit.push_back(1);
+		PmergeMe::_jacobsthalSuit.push_back(1);
+		PmergeMe::_jacobsthalSuit.push_back(1);
 	}
 	unsigned long n = 2 * nmoins2 + nmoins1;
 	if (n >= static_cast<unsigned long>(std::numeric_limits<int>::max()))
 	{
-		jacobsthalSuit.push_back(std::numeric_limits<int>::max());
+		_jacobsthalSuit.push_back(std::numeric_limits<int>::max());
 		return ;
 	}
 
-	jacobsthalSuit.push_back(n);
+	_jacobsthalSuit.push_back(n);
 	
 	_createJacobsthalDeque(nmoins1, n);
 }
@@ -310,8 +240,8 @@ void	PmergeMe::_nextNumberJacob(int & nb)
 	nb--;
 	/*Si on a un nombre qui existe dans jac
 	Alors on renvoie celui de l'index d'apres*/
-	 std::deque<int>::iterator found = std::find(jacobsthalSuit.begin(), jacobsthalSuit.end(), nb);
-	if (found != jacobsthalSuit.end())
+	 std::deque<int>::iterator found = std::find(_jacobsthalSuit.begin(), _jacobsthalSuit.end(), nb);
+	if (found != _jacobsthalSuit.end())
 	{
 		found+=2;
 		nb = *found;
@@ -324,9 +254,9 @@ int	PmergeMe::_jacobOffset(int const &nb)
 {
 	if (nb == 0)
 		return (3);
-	std::deque<int>::iterator found = std::find(jacobsthalSuit.begin(), jacobsthalSuit.end(), nb - 1);
+	std::deque<int>::iterator found = std::find(_jacobsthalSuit.begin(), _jacobsthalSuit.end(), nb - 1);
 
-	if (found != jacobsthalSuit.end())
+	if (found != _jacobsthalSuit.end())
 	{
 		found+=2;
 		return (*found - nb);
@@ -334,63 +264,11 @@ int	PmergeMe::_jacobOffset(int const &nb)
 	else
 		return (-1);
 }
-// 1 0 3 2 
-// // 
-// // 1 1 3 5 11 23
-// 12
-// 12 + x = *(it +1)
-// 1 0 3 2
 
-int	PmergeMe::_is_in_jacob(int nb)
+double	PmergeMe::getOperationTime() const
 {
-	int i = 0;
-	
-	for (intdequeIt_t it = jacobsthalSuit.begin(); it != jacobsthalSuit.end(); it++)
-	{
-		if (nb == *it)
-			return (i);
-		i++;
-	}
-	return (-1);
+	long diffSeconds = _end.tv_sec - _start.tv_sec;
+    long diffMicroseconds = _end.tv_usec - _start.tv_usec;
+	double diff = diffSeconds + diffMicroseconds * 1e-6;
+	return (diff);
 }
-
-
-// void	PmergeMe::buildJacNumberSuit()
-// {
-// 	// std::cout << "voila le next nomber jacob : \n";
-// 	// std::cout << nb << " ";
-// 	// _nextNumberJacob(nb);
-// 	// std::cout << nb << " ";
-// 	// _nextNumberJacob(nb);
-// 	// std::cout << nb << " ";
-// 	// _nextNumberJacob(nb);
-// 	// std::cout << nb << " ";
-// 	// _nextNumberJacob(nb);
-// 	// std::cout << nb << " ";
-// 	// _nextNumberJacob(nb);
-// 	// std::cout << nb << " ";
-// 	// _nextNumberJacob(nb);
-// 	// std::cout << nb << " ";
-// 	// _nextNumberJacob(nb);
-// 	// std::cout << nb << " ";
-// 	// _nextNumberJacob(nb);
-// 	// std::cout << nb << " ";
-// 	// _nextNumberJacob(nb);
-// 	// std::cout << nb << " ";
-// 	// _nextNumberJacob(nb);
-// 	// std::cout << nb << " ";
-// 	// _nextNumberJacob(nb);
-// 	// std::cout << nb << " ";
-// 	int nb = 3;
-// 	std::pair<int, int> paire;
-// 	while (nb != -1)
-// 	{
-// 		paire.first = nb;
-// 		_nextNumberJacob(nb);
-// 		paire.second = nb;
-// 		std::cout << nb << " ";
-// 		if (nb == -1)
-// 			break ;
-// 		jacNumberSuit.insert(paire);
-// 	}
-// }

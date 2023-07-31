@@ -6,7 +6,7 @@
 /*   By: snaggara <snaggara@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/25 14:22:51 by snaggara          #+#    #+#             */
-/*   Updated: 2023/07/30 23:01:26 by snaggara         ###   ########.fr       */
+/*   Updated: 2023/07/31 13:45:12 by snaggara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,119 +45,60 @@
 #include <utility>
 #include <algorithm>
 #include <limits>
+#include <sys/time.h>
 
 typedef std::deque<int> intDeque_t;
 typedef intDeque_t::iterator intdequeIt_t;
+
+typedef std::vector<int> intVector_t;
+typedef intVector_t::iterator intVectorIt_t;
+
 typedef std::deque<std::pair<int, int> > pairDeque_t;
 typedef pairDeque_t::iterator pairDequeIt_t;
 
+//template<typename T>
 class PmergeMe
 {
-
-	PmergeMe(PmergeMe const& other);
-	PmergeMe&	operator=(PmergeMe const& other);
-
-	intDeque_t _sortOneElement(intDeque_t& originalDeque);
-
-	void	_createPairs();
-
-	static void _orderPairDecreasing(std::pair<int,int> &pair);
-
-	//int	_found_second(int const &nb);
-	
-	//static int	_get_second(int const& nb);
-	static int	_get_first(std::pair<int, int> pair);
-
-	void	_addSecondElements();
-	void	_addSecondElementsWithJacob();
-
-	void	_add_by_dichotomie(int nb, intdequeIt_t begin, int length);
 
 	pairDeque_t 	_pairDeque;
 	intDeque_t 		_originalDeque;
 	intDeque_t 		_firstPairDeque;
 	intDeque_t 		_secondPairDeque;
-
-	int		_maxI;
-
-	void	_sortEachPair();
-	void	_createFirstPairDeque();
-	void	_createSecondPairDeque();
-
-	PmergeMe();
-
-	void		_createJacobsthalDeque(unsigned long nmoins1, unsigned long nmoins2);
-	void	_nextNumberJacob(int & nb);
-
-	int	_is_in_jacob(int nb);
-
-	//void	_jacobItOrder(int &i, intdequeIt_t &it);
-	int		_jacobOffset(int const &nb);
-
-	void	_addLastIfOdd();
-
-// 1 2 3 4 6
-// 1 3 5
-//Au premier tour l == 3
-
-// e3 e2 e1 1  2  3  4  5  6  7  8  10
-//    e1 e2 e3 e4 e5
-// Au premier tour l = 4
-// Au deuxieme tour l = 3
-// i = 2
+	int				_maxI;
+	intDeque_t		_jacobsthalSuit;
+	struct timeval	_start;
+	struct timeval	_end;
 
 
-// e1 e1 e2 e2 .. e5 e5
-// Avec jacob
-// e1 -> (manuel)
-// e3 = l -> 2  (3)
-// e2 = l -> 2
-// e5 = l -> 6 (7)  2 * 3 + 1
-// e4 = l -> 6
-  // e6 = l = 2 * compteur  + 
-// e11 = l -> 14 (15) 5 * 2 + 5
-// e10 = l = 
-// e9
-// e8 
-// e7 
-// e6
-// e21 -> l = 11 * 2 + 21 - 12 = 22 + 9 = 31
-// e20
 
-// 2^n - 1
-// 1 1 3 5 11 21 
-// Sans jacob
-// i = 0 -> (manuel)
-// i = 1 -> (manuel)
-// i = 2 -> longueur 3
-// i = 3 -> longueur 5
-// i = 4 -> longueuer 7
-// i = 5 -> longueuer 9
-// i = 7 -> longueuer 11
-// 1 2 3 6
-// 0
-// 1 0 3 2 5 4 11 10 9 8 
-// 0
+	PmergeMe(void);
+	PmergeMe(PmergeMe const& other);
+	PmergeMe&		operator=(PmergeMe const& other);
 
-// 1 
-
-// 2 3 4 5 6 7
-
-// 8 .. 15
+	intDeque_t	 	_sortOneElement(intDeque_t& originalDeque);
+	void			_createPairs();
+	static void 	_orderPairDecreasing(std::pair<int,int> &pair);
+	static int		_get_first(std::pair<int, int> pair);
+	void			_addSecondElementsWithJacob();
+	void			_add_by_dichotomie(int nb, intdequeIt_t begin, int length);
+	void			_sortEachPair();
+	void			_createFirstPairDeque();
+	void			_createSecondPairDeque();
+	void			_addLastIfOdd();
 
 
+	void			_createJacobsthalDeque(unsigned long nmoins1, unsigned long nmoins2);
+	void			_nextNumberJacob(int & nb);
+	int				_jacobOffset(int const &nb);
 
 public:
-	std::vector<int>	_jacobSuitNumbers;
 	PmergeMe(intDeque_t& originalDeque);
 	~PmergeMe(){};
 
-	intDeque_t	jacobsthalSuit;
-
 	intDeque_t	mergeSort();
-
-	void	buildJacNumberSuit();
-	void	_advanceCursor(int &i, intdequeIt_t &itD2, int &length);
+	void		buildJacNumberSuit();
+	void		_advanceCursor(int &i, intdequeIt_t &itD2, int &length);
+	double		getOperationTime() const;
 
 
 	class FirstNotFound : public std::exception
@@ -165,7 +106,18 @@ public:
 		public:
 			const char * what() const throw()
 			{
-				return "FirstNotFound error : You try to found the second element using a first element of the pair, but the first element doesn't exist";
+				return "PmergeMe::FirstNotFound error : You try to found the second element using a first element of the pair, but the first element doesn't exist";
+			}
+	};
+
+	class DuplicateNumbers : public std::exception
+	{
+		public:
+		int		nb;
+		DuplicateNumbers(int nb) : nb(nb){};
+			const char * what() const throw()
+			{
+				return "PmergeMe::DuplicateNumbers error : No duplicate number should be allow with PmergeMe";
 			}
 	};
 

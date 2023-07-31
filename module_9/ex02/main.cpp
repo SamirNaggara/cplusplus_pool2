@@ -6,7 +6,7 @@
 /*   By: snaggara <snaggara@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/26 12:21:48 by snaggara          #+#    #+#             */
-/*   Updated: 2023/07/27 10:10:14 by snaggara         ###   ########.fr       */
+/*   Updated: 2023/07/30 23:59:53 by snaggara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,16 +32,24 @@ int	main(int ac, char **av)
 		iss >> number;
 		originalDeque.push_back(number);
 	}
-
-	// for (std::deque<int>::iterator it = originalDeque.begin(); it != originalDeque.end(); it++)
-	// 	std::cout << *it << std::endl;
-
-	PmergeMe merge(originalDeque);
-	std::deque<int> result = merge.mergeSort();
-
-	std::cout << "La liste triée : " << std::endl;
-	for (std::deque<int>::iterator it = result.begin(); it != result.end(); it++)
+	std::cout << "\nBefore : ";
+	for (std::deque<int>::iterator it = originalDeque.begin(); it != originalDeque.end(); it++)
 		std::cout << *it << " ";
 	std::cout << std::endl;
 
+	try{
+		PmergeMe merge(originalDeque);
+		std::deque<int> result = merge.mergeSort();
+
+		std::cout << "After :  ";
+		for (std::deque<int>::iterator it = result.begin(); it != result.end(); it++)
+			std::cout << *it << " ";
+		std::cout << std::endl << std::endl;
+		std::cout << "Time to proceed a range of " << result.size() << " elements with std::deque :"
+					<< merge.getOperationTime() * 1000 << " ms";
+	}
+	catch (PmergeMe::DuplicateNumbers const& e)
+	{
+		std::cout << e.what() << "\nNumber : " << e.nb << std::endl;
+	}
 }
