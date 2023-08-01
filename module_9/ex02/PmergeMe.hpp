@@ -6,7 +6,7 @@
 /*   By: snaggara <snaggara@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/25 14:22:51 by snaggara          #+#    #+#             */
-/*   Updated: 2023/08/01 11:32:10 by snaggara         ###   ########.fr       */
+/*   Updated: 2023/08/01 11:35:36 by snaggara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,16 +60,14 @@ template<typename T>
 class PmergeMe
 {
 
-	pairDeque_t 	_pairDeque;
-	T 				_originalDeque;
-	T 				_firstPairDeque;
-	T 				_secondPairDeque;
+	pairDeque_t 	_pair;
+	T 				_original;
+	T 				_firstPair;
+	T 				_secondPair;
 	int				_maxI;
 	intDeque_t		_jacobsthalSuit;
 	struct timeval	_start;
 	struct timeval	_end;
-
-
 
 	PmergeMe(void);
 	PmergeMe(PmergeMe const& other);
@@ -82,10 +80,9 @@ class PmergeMe
 	void			_addSecondElementsWithJacob();
 	void			_add_by_dichotomie(int nb, typename T::iterator begin, int length);
 	void			_sortEachPair();
-	void			_createFirstPairDeque();
-	void			_createSecondPairDeque();
+	void			_createFirstPair();
+	void			_createSecondPair();
 	void			_addLastIfOdd();
-
 
 	void			_createJacobsthal(unsigned long nmoins1, unsigned long nmoins2);
 	void			_nextNumberJacob(int & nb);
@@ -129,15 +126,15 @@ public:
 	struct GetSecond
 	{
 	private:
-		pairDeque_t 	_pairDeque;
+		pairDeque_t 	_pair;
 
 	public:
 		GetSecond(pairDeque_t &pairDeque)
-			: _pairDeque(pairDeque)
+			: _pair(pairDeque)
 			{}
 		int operator()(int const& nb)
 		{
-			for (pairDequeIt_t it = _pairDeque.begin(); it != _pairDeque.end(); it++)
+			for (pairDequeIt_t it = _pair.begin(); it != _pair.end(); it++)
 			{
 				if (it->first == nb)
 					return (it->second);
@@ -157,7 +154,7 @@ PmergeMe<T>::PmergeMe(){};
 /*A la construction, on initialise statiquement le jacobien, si il n'existe pas*/
 template <typename T>
 PmergeMe<T>::PmergeMe(intDeque_t& originalDeque)
-	:_originalDeque(originalDeque)
+	:_original(originalDeque)
 {
     gettimeofday(&_start, NULL);
 	
@@ -184,52 +181,52 @@ PmergeMe<T>::PmergeMe(PmergeMe const& other)
 template <typename T>
 T	PmergeMe<T>::mergeSort()
 {
-	if (_originalDeque.size() == 1)
-		return _sortOneElement(_originalDeque);
+	if (_original.size() == 1)
+		return _sortOneElement(_original);
 
 	_createPairs();
 	_sortEachPair();
-	_createFirstPairDeque();
-	PmergeMe<T> merge(_firstPairDeque);
-	_firstPairDeque = merge.mergeSort();
-	_createSecondPairDeque();
+	_createFirstPair();
+	PmergeMe<T> merge(_firstPair);
+	_firstPair = merge.mergeSort();
+	_createSecondPair();
 	_addSecondElementsWithJacob();
 	_addLastIfOdd();
 	gettimeofday(&_end, NULL);
-	return (_firstPairDeque);
+	return (_firstPair);
 }
 
 template <typename T>
-void	PmergeMe<T>::_createSecondPairDeque()
+void	PmergeMe<T>::_createSecondPair()
 {
-	GetSecond getSecond(_pairDeque);
-	std::transform(_firstPairDeque.begin(), _firstPairDeque.end(), std::back_inserter(_secondPairDeque), getSecond);
+	GetSecond getSecond(_pair);
+	std::transform(_firstPair.begin(), _firstPair.end(), std::back_inserter(_secondPair), getSecond);
 }
 
 template <typename T>
-void	PmergeMe<T>::_createFirstPairDeque()
+void	PmergeMe<T>::_createFirstPair()
 {
-	std::transform(_pairDeque.begin(), _pairDeque.end(), std::back_inserter(_firstPairDeque), _get_first);
+	std::transform(_pair.begin(), _pair.end(), std::back_inserter(_firstPair), _get_first);
 }
 
 template <typename T>
 void	PmergeMe<T>::_sortEachPair()
 {
-	std::for_each(_pairDeque.begin(), _pairDeque.end(), _orderPairDecreasing);
+	std::for_each(_pair.begin(), _pair.end(), _orderPairDecreasing);
 }
 
 template <typename T>
 void	PmergeMe<T>::_addSecondElementsWithJacob()
 {
-	typename T::iterator itD2 = _secondPairDeque.begin();
+	typename T::iterator itD2 = _secondPair.begin();
 
-	_firstPairDeque.push_front(*itD2);
-	if (_secondPairDeque.size() == 1)
+	_firstPair.push_front(*itD2);
+	if (_secondPair.size() == 1)
 		return ;
 	itD2++;
-	_add_by_dichotomie(*itD2, _firstPairDeque.begin(), 1);
+	_add_by_dichotomie(*itD2, _firstPair.begin(), 1);
 	itD2--;
-	if (_secondPairDeque.size() == 2)
+	if (_secondPair.size() == 2)
 		return ;
 
 	int i = 0;
@@ -237,11 +234,11 @@ void	PmergeMe<T>::_addSecondElementsWithJacob()
 	int length = 2;
 	_maxI = 1;
 
-	while (compteur < _secondPairDeque.size())
+	while (compteur < _secondPair.size())
 	{
 		compteur++;
 		_advanceCursor(i, itD2, length);
-		_add_by_dichotomie(*itD2, _firstPairDeque.begin(), length);								
+		_add_by_dichotomie(*itD2, _firstPair.begin(), length);								
 	}
 }
 
@@ -264,7 +261,7 @@ void	PmergeMe<T>::_advanceCursor(int &i, typename T::iterator &itD2, int &length
 			i++;
 			if (i > _maxI)
 				nbMissed++;
-			if (itD2 == _secondPairDeque.end())
+			if (itD2 == _secondPair.end())
 			{
 				i--;
 				itD2--;
@@ -280,9 +277,9 @@ void	PmergeMe<T>::_advanceCursor(int &i, typename T::iterator &itD2, int &length
 template <typename T>
 void	PmergeMe<T>::_addLastIfOdd()
 {
-	if (_originalDeque.size() % 2 == 1)
+	if (_original.size() % 2 == 1)
 	{
-		_add_by_dichotomie(*(_originalDeque.end() - 1), _firstPairDeque.begin(), _firstPairDeque.size() - 1);
+		_add_by_dichotomie(*(_original.end() - 1), _firstPair.begin(), _firstPair.size() - 1);
 	}
 }
 
@@ -300,9 +297,9 @@ void	PmergeMe<T>::_add_by_dichotomie(int nb, typename T::iterator begin, int len
 	if (length == 0)
 	{
 		if (nb < *begin)
-			_firstPairDeque.insert(begin, nb);
+			_firstPair.insert(begin, nb);
 		else if (nb > *begin)
-			_firstPairDeque.insert(begin + 1, nb);
+			_firstPair.insert(begin + 1, nb);
 		else
 			throw DuplicateNumbers(nb);
 	}
@@ -351,11 +348,11 @@ void PmergeMe<T>::_orderPairDecreasing(std::pair<int,int> &pair)
 template <typename T>
 void PmergeMe<T>::_createPairs()
 {
-	for (typename T::iterator it = _originalDeque.begin(); it != _originalDeque.end(); it+=2)
+	for (typename T::iterator it = _original.begin(); it != _original.end(); it+=2)
 	{
-		if (it + 1 == _originalDeque.end())
+		if (it + 1 == _original.end())
 			break ;
-		_pairDeque.push_back(std::make_pair(*it, *(it + 1)));
+		_pair.push_back(std::make_pair(*it, *(it + 1)));
 	}
 }
 
@@ -434,7 +431,7 @@ double	PmergeMe<T>::getOperationTime() const
 /*A la construction, on initialise statiquement le jacobien, si il n'existe pas*/
 template <typename T>
 PmergeMe<T>::PmergeMe(intVector_t& originalDeque)
-	:_originalDeque(originalDeque)
+	:_original(originalDeque)
 {
     gettimeofday(&_start, NULL);
 	
@@ -449,15 +446,15 @@ PmergeMe<T>::PmergeMe(intVector_t& originalDeque)
 template <>
 void	PmergeMe<intVector_t>::_addSecondElementsWithJacob()
 {
-	typename intVector_t::iterator itD2 = _secondPairDeque.begin();
+	typename intVector_t::iterator itD2 = _secondPair.begin();
 
-	_firstPairDeque.insert(_firstPairDeque.begin(), *itD2);
-	if (_secondPairDeque.size() == 1)
+	_firstPair.insert(_firstPair.begin(), *itD2);
+	if (_secondPair.size() == 1)
 		return ;
 	itD2++;
-	_add_by_dichotomie(*itD2, _firstPairDeque.begin(), 1);
+	_add_by_dichotomie(*itD2, _firstPair.begin(), 1);
 	itD2--;
-	if (_secondPairDeque.size() == 2)
+	if (_secondPair.size() == 2)
 		return ;
 
 	int i = 0;
@@ -465,11 +462,11 @@ void	PmergeMe<intVector_t>::_addSecondElementsWithJacob()
 	int length = 2;
 	_maxI = 1;
 
-	while (compteur < _secondPairDeque.size())
+	while (compteur < _secondPair.size())
 	{
 		compteur++;
 		_advanceCursor(i, itD2, length);
-		_add_by_dichotomie(*itD2, _firstPairDeque.begin(), length);								
+		_add_by_dichotomie(*itD2, _firstPair.begin(), length);								
 	}
 }
 

@@ -6,7 +6,7 @@
 /*   By: snaggara <snaggara@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/26 12:21:48 by snaggara          #+#    #+#             */
-/*   Updated: 2023/08/01 11:30:41 by snaggara         ###   ########.fr       */
+/*   Updated: 2023/08/01 11:45:34 by snaggara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,8 +46,8 @@ double	getDiffTime(struct timeval start)
 	gettimeofday(&end, NULL);
 	long diffSeconds = end.tv_sec - start.tv_sec;
 	long diffMicroseconds = end.tv_usec - start.tv_usec;
-	double diff = diffSeconds + diffMicroseconds * 1e-6;
-	return (diff);
+	double diff = diffSeconds * 1000000 + diffMicroseconds;
+	return (diff * 1);
 
 }
 
@@ -76,7 +76,7 @@ int	main(int ac, char **av)
 		std::cout << "After :  ";
 		displayContainer<intDeque_t>(result);
 		std::cout << "\nTime to proceed a range of " << result.size() << " elements with std::deque :"
-					<< diff * 100000 << " micro s";
+					<< diff << "µs";
 	}
 	catch (PmergeMe<intDeque_t>::DuplicateNumbers const& e)
 	{
@@ -97,7 +97,7 @@ int	main(int ac, char **av)
 
 		double diff = ::getDiffTime(start);
 		std::cout << "\nTime to proceed a range of " << result.size() << " elements with std::vector :"
-					<< diff * 1000000 << " micro s";
+					<< diff << " µs";
 
 	}
 	catch (PmergeMe<intDeque_t>::DuplicateNumbers const& e)
