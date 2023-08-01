@@ -6,7 +6,7 @@
 /*   By: snaggara <snaggara@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/26 12:21:48 by snaggara          #+#    #+#             */
-/*   Updated: 2023/07/31 15:19:46 by snaggara         ###   ########.fr       */
+/*   Updated: 2023/08/01 11:30:41 by snaggara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,22 +66,24 @@ int	main(int ac, char **av)
 
 		intDeque_t originalDeque = ::createContainer<intDeque_t >(ac, av);
 
-		std::cout << "\nTest with deque : \nBefore : ";
-		displayContainer<intDeque_t>(originalDeque);
 
-		std::cout << "After :  ";
 		PmergeMe<intDeque_t> merge(originalDeque);
 		intDeque_t result = merge.mergeSort();
-		displayContainer<intDeque_t>(result);
 
 		double diff = ::getDiffTime(start);
+		std::cout << "Before :  ";
+		displayContainer<intDeque_t>(originalDeque);
+		std::cout << "After :  ";
+		displayContainer<intDeque_t>(result);
 		std::cout << "\nTime to proceed a range of " << result.size() << " elements with std::deque :"
 					<< diff * 100000 << " micro s";
 	}
 	catch (PmergeMe<intDeque_t>::DuplicateNumbers const& e)
 	{
-		std::cout << e.what() << "\nNumber : " << e.nb << std::endl;
+		std::cout << "\n\n\n\033[031m" << e.what() << "\n\033[0mNumber : " << e.nb << std::endl;
 	}
+	catch (const std::exception& ex) {
+    }
 
 	try{
 		struct timeval	start;
@@ -89,22 +91,19 @@ int	main(int ac, char **av)
 
 		intVector_t originalVector = ::createContainer<intVector_t >(ac, av);
 
-		std::cout << "\n\n\nTest with vector : \nBefore : ";
-		displayContainer<intVector_t>(originalVector);
-
-		std::cout << "After :  ";
 		PmergeMe<intVector_t> merge(originalVector);
 		(void)merge;
 		intVector_t result = merge.mergeSort();
-		displayContainer<intVector_t>(result);
 
 		double diff = ::getDiffTime(start);
-		std::cout << "\nTime to proceed a range of " << result.size() << " elements with std::deque :"
+		std::cout << "\nTime to proceed a range of " << result.size() << " elements with std::vector :"
 					<< diff * 1000000 << " micro s";
 
 	}
 	catch (PmergeMe<intDeque_t>::DuplicateNumbers const& e)
 	{
-		std::cout << e.what() << "\nNumber : " << e.nb << std::endl;
+		std::cout << "\n\n\n" << e.what() << "\nNumber : " << e.nb << std::endl;
 	}
+	catch (const std::exception& ex) {
+    }
 }
