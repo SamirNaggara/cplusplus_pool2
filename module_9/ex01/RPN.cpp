@@ -6,7 +6,7 @@
 /*   By: snaggara <snaggara@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 01:53:48 by snaggara          #+#    #+#             */
-/*   Updated: 2023/08/01 03:27:24 by snaggara         ###   ########.fr       */
+/*   Updated: 2023/08/01 12:05:34 by snaggara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,21 +48,20 @@ int&		RPN::calculate()
 
 void	RPN::_doOperation(char const& c)
 {
-	std::cout << "Voila le do operation : " << c << "\n";
 	int	nb1 = _stack.top();
 	_stack.pop();
-	if (_rpnInput.empty())
+	if (_stack.empty())
 		throw	StackEmpty();
 	int	nb2 = _stack.top();
 	_stack.pop();
 	if (c == '+')
-		_stack.push(nb1 + nb2);
+		_stack.push(nb2 + nb1);
 	else if (c == '-')
-		_stack.push(nb1 - nb2);
+		_stack.push(nb2 - nb1);
 	else if (c == '*')
-		_stack.push(nb1 * nb2);
+		_stack.push(nb2 * nb1);
 	else if (c == '/')
-		_stack.push(nb1 / nb2);
+		_stack.push(nb2 / nb1);
 	else
 		throw InvalidOperation();
 }

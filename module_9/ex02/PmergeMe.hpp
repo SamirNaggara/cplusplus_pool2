@@ -6,7 +6,7 @@
 /*   By: snaggara <snaggara@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/25 14:22:51 by snaggara          #+#    #+#             */
-/*   Updated: 2023/08/01 11:35:36 by snaggara         ###   ########.fr       */
+/*   Updated: 2023/08/01 11:54:18 by snaggara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ class PmergeMe
 	T 				_firstPair;
 	T 				_secondPair;
 	int				_maxI;
-	intDeque_t		_jacobsthalSuit;
+	T				_jacobsthalSuit;
 	struct timeval	_start;
 	struct timeval	_end;
 
@@ -390,7 +390,7 @@ void	PmergeMe<T>::_nextNumberJacob(int & nb)
 	nb--;
 	/*Si on a un nombre qui existe dans jac
 	Alors on renvoie celui de l'index d'apres*/
-	 std::deque<int>::iterator found = std::find(_jacobsthalSuit.begin(), _jacobsthalSuit.end(), nb);
+	 typename T::iterator found = std::find(_jacobsthalSuit.begin(), _jacobsthalSuit.end(), nb);
 	if (found != _jacobsthalSuit.end())
 	{
 		found+=2;
@@ -405,7 +405,7 @@ int	PmergeMe<T>::_jacobOffset(int const &nb)
 {
 	if (nb == 0)
 		return (3);
-	std::deque<int>::iterator found = std::find(_jacobsthalSuit.begin(), _jacobsthalSuit.end(), nb - 1);
+	typename T::iterator found = std::find(_jacobsthalSuit.begin(), _jacobsthalSuit.end(), nb - 1);
 
 	if (found != _jacobsthalSuit.end())
 	{
@@ -426,7 +426,6 @@ double	PmergeMe<T>::getOperationTime() const
 }
 
 
-/* Adaptation pour le vector */
 
 /*A la construction, on initialise statiquement le jacobien, si il n'existe pas*/
 template <typename T>
@@ -439,6 +438,21 @@ PmergeMe<T>::PmergeMe(intVector_t& originalDeque)
 	{
 		_createJacobsthal(1, 1);
 		_jacobsthalSuit.pop_front();
+		_jacobsthalSuit.push_back(-1);
+	}
+};
+
+/* Adaptation pour le vector */
+template <>
+PmergeMe<intVector_t>::PmergeMe(intVector_t& originalDeque)
+	:_original(originalDeque)
+{
+    gettimeofday(&_start, NULL);
+	
+	if (_jacobsthalSuit.size() == 0)
+	{
+		_createJacobsthal(1, 1);
+		_jacobsthalSuit.erase(_jacobsthalSuit.begin());
 		_jacobsthalSuit.push_back(-1);
 	}
 };
