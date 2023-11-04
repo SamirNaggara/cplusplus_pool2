@@ -6,7 +6,7 @@
 /*   By: snaggara <snaggara@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/17 00:19:46 by snaggara          #+#    #+#             */
-/*   Updated: 2023/07/18 17:12:33 by snaggara         ###   ########.fr       */
+/*   Updated: 2023/11/04 19:37:57 by snaggara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ int	main()
 		simon.execute(*rrf);
 
 		rrf->print(std::cout);
+		delete rrf;
 	}
 	catch(std::exception const& e)
 	{
@@ -53,6 +54,8 @@ int	main()
 
 		sb->print(std::cout);
 		std::cout << *sb;
+
+		delete sb;
 	}
 	catch(std::exception const& e)
 	{
@@ -73,6 +76,22 @@ int	main()
 
 		pardon->print(std::cout);
 
+		delete pardon;
+
+	}
+	catch(std::exception const& e)
+	{
+		std::cout << "Exception : " << e.what() << std::endl;
+	}
+
+	std::cout << std::endl << std::endl << "Test de creer n'importe quoi" << std::endl << std::endl;
+
+	try{
+		Intern someRandomIntern;
+		AForm* fail;
+
+		fail = someRandomIntern.makeForm("blablabla", "test");
+		delete fail;
 	}
 	catch(std::exception const& e)
 	{

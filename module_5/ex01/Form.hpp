@@ -6,7 +6,7 @@
 /*   By: snaggara <snaggara@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/17 10:51:20 by snaggara          #+#    #+#             */
-/*   Updated: 2023/07/18 15:27:21 by snaggara         ###   ########.fr       */
+/*   Updated: 2023/11/04 17:46:51 by snaggara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@
 class Form
 {
 private:
-	std::string _name;
+	std::string const _name;
 	bool		_is_signed;
 	int			_grade_to_sign;
 	int			_grade_to_exe;

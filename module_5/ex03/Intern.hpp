@@ -6,7 +6,7 @@
 /*   By: snaggara <snaggara@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/18 15:40:24 by snaggara          #+#    #+#             */
-/*   Updated: 2023/07/18 16:51:36 by snaggara         ###   ########.fr       */
+/*   Updated: 2023/11/04 19:28:05 by snaggara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,14 @@
 
 class AForm;
 
+
+
 class Intern
 {
 private:
 	std::string	_arrayFormIKnow[3];
+	AForm* _arrayFormPtr[3];
+	AForm *forms[3];
 	bool	_verifyFormExist(std::string const& formName) const;
 	AForm	*_createForm(std::string const& formName, std::string const& target);
 public:

@@ -6,7 +6,7 @@
 /*   By: snaggara <snaggara@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/18 15:55:15 by snaggara          #+#    #+#             */
-/*   Updated: 2023/07/18 17:08:09 by snaggara         ###   ########.fr       */
+/*   Updated: 2023/11/04 19:32:07 by snaggara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,14 +21,14 @@ Intern::Intern()
 	_arrayFormIKnow[0] = "shrubbery creation";
 	_arrayFormIKnow[1] = "robotomy request";
 	_arrayFormIKnow[2] = "presidential pardon";
+
 }
 
 AForm	*Intern::makeForm(std::string const& formName, std::string const& target)
 {
 	if (!_verifyFormExist(formName))
 		throw Intern::FormDontExist(formName);
-	AForm	*to_return = _createForm(formName, target);
-	return to_return;
+	return _createForm(formName, target);
 }
 
 bool	Intern::_verifyFormExist(std::string const& formName) const
@@ -43,13 +43,21 @@ bool	Intern::_verifyFormExist(std::string const& formName) const
 
 AForm	*Intern::_createForm(std::string const& formName, std::string const& target)
 {
-	AForm* formToReturn;
+	AForm *to_return = NULL;
 
-	if (formName == _arrayFormIKnow[0])
-		formToReturn = new ShrubberyCreationForm(target);
-	else if (formName == _arrayFormIKnow[1])
-		formToReturn = new RobotomyRequestForm(target);
-	else
-		formToReturn = new PresidentialPardonForm(target);
-	return (formToReturn);
+	forms[0] = new ShrubberyCreationForm(target);
+	forms[1] = new RobotomyRequestForm(target);
+	forms[2] = new PresidentialPardonForm(target);
+
+	for (int i = 0; i < 3; i++)
+	{
+		if (formName == _arrayFormIKnow[i])
+			to_return = forms[i];
+		else
+		{
+			delete forms[i];
+			forms[i] = NULL;
+		}
+	}
+	return (to_return);
 }

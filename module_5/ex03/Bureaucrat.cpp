@@ -6,7 +6,7 @@
 /*   By: snaggara <snaggara@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/17 00:07:41 by snaggara          #+#    #+#             */
-/*   Updated: 2023/07/18 15:25:50 by snaggara         ###   ########.fr       */
+/*   Updated: 2023/11/04 19:21:15 by snaggara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,6 @@ Bureaucrat::~Bureaucrat()
 
 Bureaucrat&	Bureaucrat::operator=(Bureaucrat const& bureaucrat)
 {
-	_name = bureaucrat._name;
 	_grade = bureaucrat._grade;
 	return (*this);
 }

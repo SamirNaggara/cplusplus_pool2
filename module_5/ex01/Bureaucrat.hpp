@@ -6,7 +6,7 @@
 /*   By: snaggara <snaggara@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/17 00:01:31 by snaggara          #+#    #+#             */
-/*   Updated: 2023/07/17 12:14:12 by snaggara         ###   ########.fr       */
+/*   Updated: 2023/11/04 19:20:07 by snaggara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,14 +25,14 @@ const std::string RESET = "\033[0m";
 class Bureaucrat
 {
 private:
-	std::string _name;
+	std::string const _name;
 	int			_grade;
+	Bureaucrat&	operator=(Bureaucrat const& bureaucrat);
 public:
 	Bureaucrat(void);
 	Bureaucrat(std::string const name, int grade);
 	Bureaucrat(Bureaucrat const& bureaucrat);
 	virtual 	~Bureaucrat();
-	Bureaucrat&	operator=(Bureaucrat const& bureaucrat);
 	std::string	getName() const;
 	int			getGrade() const;
 	int			gradeIncrement(int const nb_inc);
