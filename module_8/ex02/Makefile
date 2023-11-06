@@ -4,7 +4,7 @@ RM			= 	rm -f
 GREEN		= 	\033[0;32m
 BIG			= 	\033[0;1m
 RESET		= 	\033[0m
-CC			=	g++
+CC			=	c++
 RM			=	rm -f
 
 
