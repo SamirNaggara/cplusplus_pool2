@@ -6,7 +6,7 @@
 /*   By: snaggara <snaggara@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/22 23:46:18 by snaggara          #+#    #+#             */
-/*   Updated: 2023/07/23 00:33:04 by snaggara         ###   ########.fr       */
+/*   Updated: 2023/11/06 15:12:11 by snaggara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 template<typename T, typename U>
 void	iter(T *tab, size_t size, U(&f)(T&))
 {
-	for (size_t i; i < size; i++)
+	for (size_t i = 0; i < size; i++)
 		(*f)(tab[i]);
 }
 
